@@ -1,6 +1,6 @@
 import * as Effect from '@effect/io/Effect';
 import { pipe } from '@effect/data/Function';
-import axios, { AxiosRequestConfig, AxiosError } from 'axios';
+import axios, { AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
 
 import { BadRequest, HttpError, InternalServerError, NotFound } from "../http/errors.js";
 
@@ -14,7 +14,7 @@ export interface HttpClient {
     Effect.Effect<never, HttpError, ClientResponse<T>>
 }
 
-export const defaultErrorMapper = <T extends unknown>(err: unknown): HttpError<T> => {
+export const defaultErrorMapper = (err: unknown): HttpError => {
   if (err instanceof AxiosError) {
     switch (err.response?.status) {
       case 404:
