@@ -1,6 +1,6 @@
 import * as Effect from '@effect/io/Effect';
-import { pipe } from '@effect/data/Function';
 import * as S from "@effect/schema/Schema";
+import { pipe } from '@effect/data/Function';
 
 import { HttpError } from '../common/http/errors.js';
 import { TodoClient } from '../common/client/todoClient.js';
