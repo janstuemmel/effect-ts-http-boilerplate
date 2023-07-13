@@ -5,7 +5,7 @@ import * as S from "@effect/schema/Schema";
 import { HttpError } from '../common/http/errors.js';
 import { TodoClient } from '../common/client/todoClient.js';
 import { AppRequest, AppResponse, createAppResponse } from '../common/http/http.js';
-import { validatePathParams } from '../common/validation/validateRequest.js';
+import { validateRequest } from '../common/validation/validateRequest.js';
 
 const TodoRequestSchema = S.struct({
   path: S.struct({
@@ -13,7 +13,7 @@ const TodoRequestSchema = S.struct({
   })
 })
 
-export const validateRequest = validatePathParams(TodoRequestSchema)
+export const validate = validateRequest(TodoRequestSchema)
 
 export const getTodo = (id: number) => TodoClient.pipe(
   Effect.flatMap(c => c.request<{title: string}>(`/todos/${id}`)),
@@ -21,7 +21,7 @@ export const getTodo = (id: number) => TodoClient.pipe(
 );
 
 export const getTodoHandler = (req: AppRequest): Effect.Effect<any, HttpError, AppResponse> => pipe(
-  validateRequest(req),
+  validate(req),
   Effect.map(({ path }) => path.id),
   Effect.flatMap(getTodo),
   Effect.flatMap(createAppResponse)

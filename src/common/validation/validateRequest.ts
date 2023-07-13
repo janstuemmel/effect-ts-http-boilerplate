@@ -5,7 +5,7 @@ import { pipe } from '@effect/data/Function';
 import { AppRequest } from "../http/http.js";
 import { BadRequest } from '../http/errors.js';
 
-export const validatePathParams = <T, D>(schema: S.Schema<T, D>) => (req: AppRequest) => pipe(
+export const validateRequest = <T, D>(schema: S.Schema<T, D>) => (req: AppRequest) => pipe(
   S.parseEither(schema)(req),
   Effect.mapError(() => new BadRequest('validation error')),
 )

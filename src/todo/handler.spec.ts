@@ -6,7 +6,7 @@ import { pipe } from '@effect/data/Function';
 
 import { Config } from '../common/config/config.js';
 import { TodoClientLayer } from '../common/client/todoClient.js';
-import { validateRequest, getTodoHandler } from './handler.js';
+import { validate, getTodoHandler } from './handler.js';
 
 import stageConfig from '../../config/stage.js';
 
@@ -41,7 +41,7 @@ it('request fail', async () => {
 
 it('validate path params', () => {
   const program = pipe(
-    validateRequest({ path: { id: '1' } }),
+    validate({ path: { id: '1' } }),
     Effect.flatMap((req) => Effect.succeed(`${req.path.id} is a number from string`)),
     Effect.catchAll(() => Effect.succeed('Not a number')),
   )
@@ -51,7 +51,7 @@ it('validate path params', () => {
 
 it('validate fail path params', () => {
   const program = pipe(
-    validateRequest({ path: { id: 'dummy' } }),
+    validate({ path: { id: 'dummy' } }),
     Effect.flatMap((req) => Effect.succeed(`${req.path.id} is a number from string`)),
     Effect.catchAll(() => Effect.succeed('Not a number')),
   )
