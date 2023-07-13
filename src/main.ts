@@ -1,5 +1,5 @@
 import http from 'http';
-import findMyWay, {  } from 'find-my-way';
+import findMyWay from 'find-my-way';
 
 import * as Layer from '@effect/io/Layer';
 import { pipe } from '@effect/data/Function';
