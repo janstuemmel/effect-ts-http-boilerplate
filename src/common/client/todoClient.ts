@@ -5,7 +5,9 @@ import * as Effect from '@effect/io/Effect';
 import { HttpClient, request } from "./client.js";
 import { Config } from "../config/config.js";
 
-export const TodoClient = Context.Tag<HttpClient>();
+export interface TodoClient extends HttpClient {}
+
+export const TodoClient = Context.Tag<TodoClient>();
 
 export const TodoClientLayer = Layer.effect(
   TodoClient,

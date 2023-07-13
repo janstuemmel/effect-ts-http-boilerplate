@@ -4,7 +4,7 @@ import axios, { AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
 
 import { BadRequest, HttpError, InternalServerError, NotFound } from "../http/errors.js";
 
-export type ClientResponse<T> = {
+export type ClientResponse<T = any> = {
   status: number
   data: T
 }

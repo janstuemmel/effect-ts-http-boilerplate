@@ -9,7 +9,7 @@ import { HttpError } from './errors.js';
 export const wrapRequest = (
   di: Layer.Layer<never, never, any>
 ) => (
-  effect: (req: AppRequest) => Effect.Effect<any, HttpError, AppResponse>
+  effect: (req: AppRequest) => Effect.Effect<unknown, HttpError, AppResponse>
 ) => async (
   req: Req<any>,
   res: Res<any>,

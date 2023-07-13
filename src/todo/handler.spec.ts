@@ -1,42 +1,42 @@
 import { it, expect } from 'vitest';
 
 import * as Effect from '@effect/io/Effect';
-import * as Layer from '@effect/io/Layer';
 import { pipe } from '@effect/data/Function';
 
-import { Config } from '../common/config/config.js';
-import { TodoClientLayer } from '../common/client/todoClient.js';
+import { TodoClient } from '../common/client/todoClient.js';
 import { validate, getTodoHandler } from './handler.js';
 
-import stageConfig from '../../config/stage.js';
+import { HttpError } from '../common/http/errors.js';
+import { ClientResponse, HttpClient } from '../common/client/client.js';
+import { AppResponse } from '../common/http/http.js';
 
-const config = Layer.succeed(
-  Config,
-  Config.of(stageConfig)
-);
-
-const di = pipe(
-  config,
-  Layer.provide(TodoClientLayer),
-);
+const provideMockContext = (
+  handler: Effect.Effect<HttpClient, HttpError, AppResponse>,
+  request: Effect.Effect<never, HttpError, ClientResponse>,
+) => handler.pipe(
+  Effect.provideService(TodoClient, TodoClient.of({ request: () => request }))
+)
 
 it('request success', async () => {
+  const todo = { title: 'dummy' }
   const handler = getTodoHandler({ path: { id: '1' } })
-  const runnable = Effect.provideLayer(handler, di)
+  const runnable = provideMockContext(handler, Effect.succeed({ data: todo, status: 200}))
   const res = await Effect.runPromise(runnable);
-  expect(res).toMatchObject({
-    status: 200,
-    body: {
-      title: expect.any(String)
-    }
-  });
+  expect(res).toMatchObject({ status: 200, body: todo });
+});
+
+it('return error when fail', async () => {
+  const handler = getTodoHandler({ path: { id: '1' } })
+  const runnable = provideMockContext(handler, Effect.fail(new HttpError))
+  const req = Effect.runPromise(runnable);
+  await expect(req).rejects.toMatchInlineSnapshot('[Error: {"_tag":"HttpError","status":0}]')
 });
 
 it('request fail', async () => {
   const handler = getTodoHandler({ path: { id: 'xxx' } })
-  const runnable = Effect.provideLayer(handler, di)
+  const runnable = provideMockContext(handler, Effect.fail(new HttpError))
   const req = Effect.runPromise(runnable);
-  expect(req).rejects.toMatchInlineSnapshot('[Error: {"_tag":"BadRequest","status":400,"body":"validation error"}]');
+  await expect(req).rejects.toMatchInlineSnapshot('[Error: {"_tag":"BadRequest","status":400,"body":"validation error"}]');
 });
 
 it('validate path params', () => {
