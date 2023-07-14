@@ -1,5 +1,8 @@
 import * as Layer from '@effect/io/Layer';
 import * as Effect from '@effect/io/Effect';
+import * as C from '@effect/io/Config';
+import { ConfigError } from '@effect/io/Config/Error';
+
 import { pipe } from '@effect/data/Function';
 import { Res, Req } from 'find-my-way';
 
@@ -7,11 +10,11 @@ import { AppRequest, AppResponse, PathParams, createAppResponse } from './http.j
 import { HttpError } from './errors.js';
 
 export const wrapRequest = (
-  di: Layer.Layer<never, never, any>
+  di: Layer.Layer<never, ConfigError | HttpError, any>
 ) => (
   effect: (req: AppRequest) => Effect.Effect<unknown, HttpError, AppResponse>
 ) => async (
-  req: Req<any>,
+  _req: Req<any>,
   res: Res<any>,
   params: PathParams,
 ) => {
@@ -20,6 +23,8 @@ export const wrapRequest = (
     Effect.flatMap(effect),
     Effect.catchAll((err) => createAppResponse(err.body, err.status)),
     Effect.provideLayer(di),
+    // in case of config error
+    Effect.catchAll((err) => createAppResponse(undefined, 500))
   ));
 
   res.setHeader('Content-Type', 'application/json')

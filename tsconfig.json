@@ -4,6 +4,6 @@
     "module": "ESNext",
     "moduleResolution": "NodeNext",
     "allowSyntheticDefaultImports": true,
-    "exactOptionalPropertyTypes": true
+    // "exactOptionalPropertyTypes": true
   }
 }
